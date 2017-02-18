@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <!-- [START css] -->
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/keen-dashboards.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dc.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-responsive.css') }}"">
+    <!-- [END css] -->
+    <link href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.min.js"></script>
+    <style type="text/css">
+      body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+      }
+      blockquote {
+        margin-bottom: 10px;
+        border-left-color: #bbb;
+      }
+      form {
+        margin-top: 10px;
+      }
+      .form-signin input[type="text"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
+      }
+      .row {
+        margin-left: 0px;
+        margin-top: 10px;
+        overflow: scroll;
+      }
+      .subcontainer {
+        width: 50%;
+        float: left;
+        background-color: yellow;
+        height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="./">Same Page Dashboard</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+
+  <div class="row">
+
+    <div class="col-md-6" >
+      <div class="row">
+
+        <!-- Time Chart -->
+        <div class="col-md-6" style='width:50%; float:left'>
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              Stress Level and Self Harm Level
+            </div>
+            <div class="chart-stage">
+              {{ stresschart.htmlcontent|safe }}
+            </div>
+          </div>
+        </div>
+        <!-- Time Chart -->
+
+        <!-- Resources Pie -->
+        <div class="col-md-6">
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              Mood Type
+            </div>
+            <div class="chart-stage">
+              {{ moodchart.htmlcontent|safe }}
+            </div>
+          </div>
+        </div>
+        <!-- Resources Pie -->
+
+      </div>
+      <hr>
+      <p class="small text-muted">Built with &#9829; by Kojin, Nick, Eric and Alex</a></p>
+    </div>
+  </div>
+</div>
+  </body>
+</html>
