@@ -8,15 +8,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dc.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-responsive.css') }}"">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-responsive.css') }}">
     <!-- [END css] -->
     <link href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css" rel="stylesheet">
     <script src="https://d3js.org/d3.v3.js"></script>
     <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.min.js"></script>
     <style type="text/css">
+
       body {
         padding-top: 40px;
-        padding-bottom: 40px;
+        padding-bottom: 0;
+        padding-left: 0;
         background-color: #f5f5f5;
       }
       blockquote {
@@ -43,29 +45,111 @@
         background-color: yellow;
         height: 500px;
       }
+
+      table {
+          border-collapse: collapse;
+          width: 100%;
+      }
+
+      th, td {
+          text-align: left;
+          padding: 8px;
+      }
+
+      tr:nth-child(even){background-color: #f2f2f2}
+
+      th {
+          background-color: #4CAF50;
+          color: white;
+      }
+
+      .sidebar1 {
+
+
+          background-image: linear-gradient(to top, #1e3c72 0%, #1e3c72 1%, #2a5298 100%);
+
+          padding: 0px;
+          min-height: 100%;
+      }
+      .logo {
+          max-height: 130px;
+      }
+      .logo>img {
+          margin-top: 30px;
+          padding: 3px;
+          margin-left: 50px;
+          border: 3px solid white;
+          border-radius: 100%;
+      }
+      .list {
+          color: #fff;
+          list-style: none;
+          padding-left: 0px;
+      }
+      .list::first-line {
+          color: rgba(255, 255, 255, 0.5);
+      }
+      .list> li, h5 {
+          padding: 5px 0px 5px 40px;
+      }
+      .list>li:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+          border-left: 5px solid white;
+          color: white;
+          font-weight: bolder;
+          padding-left: 35px;
+      }.main-content{
+      text-align:center;
+      }
+      .list {
+        margin: 0;
+      }
     </style>
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="./">Same Page Dashboard</a>
+    <div class="navbar-header" style='height:40px;'>
+      <hr style='margin:15px;border-top:0; border-bottom:0'/>
+      <a class="navbar-brand" href="./" style='font-size:20px; margin-top:20px'>Same Page Dashboard</a>
     </div>
   </div>
 </div>
+<div class="col-md-2 col-sm-4 sidebar1" style='width:15%;margin:1%; float:left; height:900px; margin-left: 0;'>
+    <div class="logo">
+        <img src="https://scontent.xx.fbcdn.net/v/t31.0-8/13063450_150421302022841_8910854149735539320_o.jpg?oh=c405525d8b4848396e30694f92294bd2&oe=59452E80" class="img-responsive center-block" style="width:70px;" alt="Logo">
+    </div>
+    <br>
+    <div class="left-navigation">
+        <ul class="list">
+            <h5><strong>PATIENTS</strong></h5>
+            <li>Kojin</li>
+            <li>Nick</li>
+            <li>Eric</li>
+            <li>Dejeu</li>
+        </ul>
 
-<div class="container-fluid">
+        <br>
+
+        <ul class="list" style='height: 30vh;'>
+            <h5><strong>SETTINGS</strong></h5>
+            <li>About</li>
+            <li>Log Out</li>
+        </ul>
+    </div>
+</div>
+
+<div class="container-fluid col-md-8">
 
   <div class="row">
-
-    <div class="col-md-6" >
+    <div class="col-md-8" >
       <div class="row">
 
         <!-- Time Chart -->
         <div class="col-md-6" style='width:50%; float:left'>
           <div class="chart-wrapper">
             <div class="chart-title">
-              Stress Level and Self Harm Level
+              Stress, Self Harm and Physical Activity
             </div>
             <div class="chart-stage">
               {{ stresschart.htmlcontent|safe }}
@@ -86,6 +170,22 @@
           </div>
         </div>
         <!-- Resources Pie -->
+        <div class="col-md-12" >
+          <div class="row">
+
+            <!-- Time Chart -->
+            <div class="col-md-12" style='width:100%; float:left'>
+              <div class="chart-wrapper">
+                <div class="chart-title">
+                  Trigger, Resolution and Additional Notes
+                </div>
+                <div class="chart-stage">
+                  {{ table|safe }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
       <hr>

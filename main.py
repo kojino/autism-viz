@@ -1,62 +1,93 @@
-# Copyright 2015 Google Inc. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+# -*- coding: utf-8 -*-
 # [START app]
 import logging
-from nvd3 import pieChart, lineChart
-
-
+from nvd3 import pieChart, lineChart, lineWithFocusChart
+from urllib2 import urlopen
+import json
 from flask import Flask, render_template
-
+from collections import OrderedDict
+import requests
 
 app = Flask(__name__)
 
+def get_request(path):
+    """
+    Given a path, e.g. '/search/' and params, return the response in json form.
+    You may request additional parameters by overriding the params method
+    """
+    response = urlopen(path)
+
+    str_response = response.read().decode('utf-8')
+    result = json.loads(str_response)
+
+
+    return result
+
+def get_emotion_dict(events):
+    event_dict = OrderedDict([('joy', 0), ('sorrow', 0), ('anger', 0), ('surprise', 0), ('neutral', 0)])
+    for event in events:
+        mood = event['mood']
+        if mood in event_dict:
+            event_dict[mood] += 1
+    return event_dict
+
+def get_stress_level(events):
+    xdata = []
+    ydata_stress = []
+    ydata_harm = []
+    ydata_physical = []
+    for event in events:
+        xdata.append(event['time'])
+        ydata_stress.append(event['stress_level'])
+        ydata_physical.append(event['physical_activity_level'])
+        ydata_harm.append(event['self_harm_level'])
+    return xdata, ydata_stress, ydata_harm, ydata_physical
+
+def get_table_items(events):
+    data = []
+    for event in events:
+        row = [event['trigger'], event['resolution'], event['additional_notes']]
+        data.append(row)
+    return data
 
 @app.route('/')
 def hello():
+    events = requests.get("https://autism-tracker-server.appspot.com/events").json()
+    emotion_dict = get_emotion_dict(events)
     type = 'pieChart'
     moodchart = pieChart(name=type, color_category='category20c', height=450, width=450)
-    xdata = ["Orange", "Banana", "Pear", "Kiwi", "Apple", "Strawberry", "Pineapple"]
-    ydata = [3, 4, 0, 1, 5, 7, 3]
-    extra_serie = {"tooltip": {"y_start": "", "y_end": " cal"}}
+    xdata = [key for key in ['😁 joy', '😢 sorrow', '😠 anger', '😲 surprise', '😐 neutral']]
+    ydata = [emotion_dict[key] for key in emotion_dict]
+
+    extra_serie = {"tooltip": {"y_start": "", "y_end": " %"}}
     moodchart.add_serie(y=ydata, x=xdata, extra=extra_serie)
     moodchart.buildcontent()
+    stresschart = lineWithFocusChart(name='lineWithFocusChart', x_is_date=True, x_axis_format="%d %b %Y")
+    xdata, ydata_stress, ydata_harm, ydata_physical = get_stress_level(events)
+    extra_serie = {"tooltip": {"y_start": "", "y_end": " ext"},
+                   "date_format": "%d %b %Y %H"}
+    stresschart.add_serie(name="Stress Level", y=ydata_stress, x=xdata, extra=extra_serie)
+    stresschart.add_serie(name="Self Harm Level", y=ydata_harm, x=xdata, extra=extra_serie)
+    stresschart.add_serie(name="Physical Activity Level", y=ydata_physical, x=xdata, extra=extra_serie)
 
-    stresschart = lineChart(name="lineChart", x_is_date=False, x_axis_format="AM_PM")
-    xdata = range(24)
-    ydata = [0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 4, 3, 3, 5, 7, 5, 3, 16, 6, 9, 15, 4, 12]
-    ydata2 = [9, 8, 11, 8, 3, 7, 10, 8, 6, 6, 9, 6, 5, 4, 3, 10, 0, 6, 3, 1, 0, 0, 0, 1]
-
-    extra_serie = {"tooltip": {"y_start": "There are ", "y_end": " calls"}}
-    stresschart.add_serie(y=ydata, x=xdata, name='sine', extra=extra_serie)
-    extra_serie = {"tooltip": {"y_start": "", "y_end": " min"}}
-    stresschart.add_serie(y=ydata2, x=xdata, name='cose', extra=extra_serie)
     stresschart.buildhtml()
 
-    harmchart = lineChart(name="lineChart", x_is_date=False, x_axis_format="AM_PM")
-    xdata = range(24)
-    ydata = [0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 4, 3, 3, 5, 7, 5, 3, 16, 6, 9, 15, 4, 12]
-    ydata2 = [9, 8, 11, 8, 3, 7, 10, 8, 6, 6, 9, 6, 5, 4, 3, 10, 0, 6, 3, 1, 0, 0, 0, 1]
+    html = """<table>
+                <tr>
+                  <th>Trigger</th>
+                  <th>Resolution</th>
+                  <th>Additional Notes</th>
+                </tr>
+                {0}
+              </table>"""
+    items = get_table_items(events)
+    tr = "<tr>{0}</tr>"
+    td = "<td>{0}</td>"
+    subitems = [tr.format(''.join([td.format(a) for a in item])) for item in items]
+    table = html.format("".join(subitems))
 
-    extra_serie = {"tooltip": {"y_start": "There are ", "y_end": " calls"}}
-    harmchart.add_serie(y=ydata, x=xdata, name='sine', extra=extra_serie)
-    extra_serie = {"tooltip": {"y_start": "", "y_end": " min"}}
-    harmchart.add_serie(y=ydata2, x=xdata, name='cose', extra=extra_serie)
-    harmchart.buildhtml()
 
-    return render_template('index.html', moodchart=moodchart, stresschart=stresschart, harmchart=harmchart)
-
+    return render_template('index.html', table=table, moodchart=moodchart, stresschart=stresschart)
 
 @app.errorhandler(500)
 def server_error(e):
